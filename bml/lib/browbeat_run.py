@@ -28,8 +28,8 @@ class browbeat_run(object):
             = elastic_connection.compute_start_end(uuid)
         # print graphite_details
         self._metrics_root = graphite_details[2]
-        self._graphite_start = int(graphite_details[0]) / 1000
-        self._graphite_end = int(graphite_details[1]) / 1000
+        self._graphite_start = int(graphite_details[0])
+        self._graphite_end = int(graphite_details[1])
         self._graphite_url = graphite_details[3]
         # Not needed but keeping in case the new way breaks
         # this timestamp should never be smaller than any time in

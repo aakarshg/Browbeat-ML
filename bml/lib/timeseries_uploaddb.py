@@ -32,8 +32,8 @@ def insert_timeseriessummaries_db(elastic, config, uuid):
     brun = browbeat_run(elastic, uuid, timeseries=True)
     graphite_details = brun.get_graphite_details()
     graphite_url = graphite_details[0]
-    start = graphite_details[1]
-    end = graphite_details[2]
+    start = graphite_details[1] / 1000
+    end = graphite_details[2] / 1000
     metric_base = str(graphite_details[3]) + "."
     base_url = "{}/render?target={}"
     time_url = "&format=json&from={}&until={}"

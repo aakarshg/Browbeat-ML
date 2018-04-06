@@ -87,3 +87,33 @@ class Backend(object):
             graphite_port = "80"
             graphite_url = "http://{}:{}".format(graphite_url, graphite_port)
         return [start, end, cloud_name, graphite_url]
+
+
+    def compute_hits(self, start, end, cloud_name, level_type):
+        time_dict = {
+            "format": "epoch_millis"
+        }
+        time_dict["gte"] = start
+        time_dict["lte"] = end
+        query_input = {
+            "query": {
+                "bool": {
+                    "must": {
+                        "query_string": {
+                            "query": "browbeat.cloud_name: \
+                            " + cloud_name + " AND level: " + level_type
+                            }
+                        },
+                    "filter": {
+                        "bool": {
+                            "must": [
+                                {
+                                    "range": {
+                                        "@timestamp": time_dict
+                                    }
+                                }
+                            ],
+                            "must_not": []
+                            }}}}}
+        res = self.es.search(index="logstash-*", body=query_input)
+        return res['hits']['total']

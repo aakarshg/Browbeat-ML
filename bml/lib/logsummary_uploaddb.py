@@ -1,64 +1,19 @@
 from elasticsearch import Elasticsearch
 from util import connect_crdb
+from browbeat_run import browbeat_run
 
 
-def compute_hits(es, start, end, cloud_name, level_type):
-    time_dict = {
-        "format": "epoch_millis"
-    }
-    time_dict["gte"] = start
-    time_dict["lte"] = end
-    query_input = {
-        "query": {
-            "filtered": {
-                "query": {
-                    "query_string": {
-                        "query": "browbeat.cloud_name: \
-                        " + cloud_name + " AND level: " + level_type
-                        }
-                    },
-                "filter": {
-                    "bool": {
-                        "must": [
-                            {
-                                "range": {
-                                    "@timestamp": time_dict
-                                }
-                            }
-                        ],
-                        "must_not": []
-                        }}}}}
-    res = es.search(index="logstash-*", body=query_input)
-    return res['hits']['total']
-
-
-def insert_logsummary_db(config, uuid):
-    es = Elasticsearch([{'host': 'elk.browbeatproject.org', 'port': 9200}])
-    query_input = {
-        "query": {
-            "match": {
-                'browbeat_uuid': uuid
-                }
-            },
-        "aggs": {
-            "max_time": {
-                "max": {
-                    "field": "timestamp"
-                    }
-                },
-            "min_time": {
-                "min": {
-                    "field": "timestamp"
-                    }}}}
-    res = es.search(index="browbeat-rally-*", body=query_input)
-    start = int(res['aggregations']['min_time']['value'])
-    end = int(res['aggregations']['max_time']['value'])
-    cloud_name = res['hits']['hits'][0]['_source']['cloud_name']
-    num_errors = compute_hits(es, start, end, cloud_name, 'error')
-    num_warn = compute_hits(es, start, end, cloud_name, 'warning')
-    num_debug = compute_hits(es, start, end, cloud_name, 'debug')
-    num_notice = compute_hits(es, start, end, cloud_name, 'notice')
-    num_info = compute_hits(es, start, end, cloud_name, 'info')
+def insert_logsummary_db(es, config, uuid):
+    brun = browbeat_run(es, uuid, timeseries=True)
+    graphite_details = brun.get_graphite_details()
+    start = graphite_details[1]
+    end = graphite_details[2]
+    cloud_name = str(graphite_details[3])
+    num_errors = es.compute_hits(start, end, cloud_name, 'error')
+    num_warn = es.compute_hits(start, end, cloud_name, 'warning')
+    num_debug = es.compute_hits(start, end, cloud_name, 'debug')
+    num_notice = es.compute_hits(start, end, cloud_name, 'notice')
+    num_info = es.compute_hits(start, end, cloud_name, 'info')
     conn = connect_crdb(config)
     conn.set_session(autocommit=True)
     cur = conn.cursor()

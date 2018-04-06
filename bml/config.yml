@@ -1,4 +1,4 @@
-elastic-host: elk.browbeatproject.org
+elastic-host: elk-b09-h30-r720xd.rdu.openstack.engineering.redhat.com
 elastic-port: 9200
 
 tests:

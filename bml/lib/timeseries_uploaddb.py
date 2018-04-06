@@ -28,9 +28,7 @@ def get_features(gdata, pos):
         return [mean, percentile95]
 
 
-def insert_timeseriessummaries_db(config, uuid):
-    # WIP should pass the backend object here
-    elastic = Backend("elk.browbeatproject.org", "9200")
+def insert_timeseriessummaries_db(elastic, config, uuid):
     brun = browbeat_run(elastic, uuid, timeseries=True)
     graphite_details = brun.get_graphite_details()
     graphite_url = graphite_details[0]

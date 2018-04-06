@@ -14,10 +14,6 @@ class Backend(object):
              'port': port}],
             send_get_body_as='POST',
             retries=True,
-            sniff_on_start=True,
-            sniff_on_connection_fail=True,
-            sniff_timeout=10,
-            sniffer_timeout=120,
             timeout=120)
 
     def grab_uuids_by_date(self, version, time_period):
@@ -53,6 +49,7 @@ class Backend(object):
         query = {"query": {"match": {'browbeat_uuid': uuid}}}
         results = helpers.scan(self.es,
                                query,
+                               raise_on_error=False,
                                size=100,
                                request_timeout=1000)
 

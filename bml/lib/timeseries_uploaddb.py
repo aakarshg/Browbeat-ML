@@ -1,7 +1,7 @@
 import numpy
 import requests
 from browbeat_run import browbeat_run
-from util import connect_crdb
+from update_crdb import insert_timeseriessummaries_db
 
 metrics_list = ["overcloud-controller-0.cpu-*.cpu-system",
                 "overcloud-controller-0.cpu-*.cpu-user",
@@ -27,7 +27,7 @@ def get_features(gdata, pos):
         return [mean, percentile95]
 
 
-def insert_timeseriessummaries_db(elastic, config, uuid):
+def timeseriessummaries_db(elastic, config, uuid):
     brun = browbeat_run(elastic, uuid, timeseries=True)
     graphite_details = brun.get_graphite_details()
     graphite_url = graphite_details[0]
@@ -41,30 +41,15 @@ def insert_timeseriessummaries_db(elastic, config, uuid):
     time_url = time_url.format(start,
                                end)
     final_url = base_url + "{}" + time_url
-    conn = connect_crdb(config)
-    conn.set_session(autocommit=True)
-    cur = conn.cursor()
     cpu_system = summarize_metric(final_url, metrics_list[0])
     cpu_user = summarize_metric(final_url, metrics_list[1])
     cpu_softirq = summarize_metric(final_url, metrics_list[2])
     cpu_wait = summarize_metric(final_url, metrics_list[3])
     mem_slabunrecl = summarize_metric(final_url, metrics_list[4])
     mem_used = summarize_metric(final_url, metrics_list[5])
-    cur.execute("INSERT INTO {} VALUES ('{}', {}, {}, {}, {}, {}, {},\
-                {}, {}, {}, {}, {}, {});".format(config['table_timeseries'][0],
-                                                 str(uuid),
-                                                 float(cpu_system[0]),
-                                                 float(cpu_system[1]),
-                                                 float(cpu_user[0]),
-                                                 float(cpu_user[1]),
-                                                 float(cpu_softirq[0]),
-                                                 float(cpu_softirq[1]),
-                                                 float(cpu_wait[0]),
-                                                 float(cpu_wait[1]),
-                                                 float(mem_used[0]),
-                                                 float(mem_used[1]),
-                                                 float(mem_slabunrecl[0]),
-                                                 float(mem_slabunrecl[1])))
+    insert_timeseriessummaries_db(config, uuid, cpu_system, cpu_user,
+                                  cpu_softirq, cpu_wait, mem_slabunrecl,
+                                  mem_used)
 
 
 def summarize_metric(final_url, metric_id):

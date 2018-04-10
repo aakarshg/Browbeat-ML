@@ -94,9 +94,9 @@ def main():
                                       str(args.days) + "d",
                                       args.version, update=False)
     elif args.timeseries_uuid is not None:
-        lib.timeseries_uploaddb.insert_timeseriessummaries_db(es_backend, config, args.timeseries_uuid) # noqa
+        lib.timeseries_uploaddb.timeseriessummaries_db(es_backend, config, args.timeseries_uuid) # noqa
     elif args.loggin_uuid is not None:
-        lib.logsummary_uploaddb.insert_logsummary_db(es_backend, config, args.loggin_uuid) # noqa
+        lib.logsummary_uploaddb.logsummary_db(es_backend, config, args.loggin_uuid) # noqa
     elif args.summary_uuid is not None:
         lib.data_summary.summary_uuid(es_backend, config, args.summary_uuid,
                                       args.update)

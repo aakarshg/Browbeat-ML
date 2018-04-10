@@ -122,6 +122,11 @@ table_name:
 table_errors:
   - 'num_errors'
 
+# This needs to be updated before end of each release cycle
+# https://releases.openstack.org/. 
+master:
+  - '14-tripleo'
+
 table_timeseries:
   - 'timeseries_summary'
 

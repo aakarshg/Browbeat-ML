@@ -1,6 +1,5 @@
 import numpy
 import requests
-from elastic_backend import Backend
 from browbeat_run import browbeat_run
 from util import connect_crdb
 

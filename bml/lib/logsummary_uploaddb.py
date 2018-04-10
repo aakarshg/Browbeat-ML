@@ -1,4 +1,3 @@
-from elasticsearch import Elasticsearch
 from util import connect_crdb
 from browbeat_run import browbeat_run
 

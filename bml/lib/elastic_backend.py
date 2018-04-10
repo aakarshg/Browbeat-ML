@@ -88,7 +88,6 @@ class Backend(object):
             graphite_url = "http://{}:{}".format(graphite_url, graphite_port)
         return [start, end, cloud_name, graphite_url]
 
-
     def compute_hits(self, start, end, cloud_name, level_type):
         time_dict = {
             "format": "epoch_millis"

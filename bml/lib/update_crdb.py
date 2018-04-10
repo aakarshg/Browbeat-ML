@@ -76,23 +76,24 @@ def insert_logsummary_db(config, uuid, num_errors, num_warn,
                                              int(num_notice),
                                              int(num_info)))
 
-def insert_timeseriessummaries_db(config, uuid, cpu_system, cpu_softirq,
-                                  cpu_wait, mem_used, mem_slabunrecl):
+def insert_timeseriessummaries_db(config, uuid, cpu_system, cpu_user,
+                                  cpu_softirq, cpu_wait, mem_used,
+                                  mem_slabunrecl):
     conn = connect_crdb(config)
     conn.set_session(autocommit=True)
     cur = conn.cursor()
     cur.execute("INSERT INTO {} VALUES ('{}', {}, {}, {}, {}, {}, {},\
                 {}, {}, {}, {}, {}, {});".format(config['table_timeseries'][0],
                                                  str(uuid),
-                                                 float(cpu_system[0]),
-                                                 float(cpu_system[1]),
-                                                 float(cpu_user[0]),
-                                                 float(cpu_user[1]),
-                                                 float(cpu_softirq[0]),
-                                                 float(cpu_softirq[1]),
-                                                 float(cpu_wait[0]),
-                                                 float(cpu_wait[1]),
-                                                 float(mem_used[0]),
-                                                 float(mem_used[1]),
-                                                 float(mem_slabunrecl[0]),
-                                                 float(mem_slabunrecl[1])))
+                                                 round(cpu_system[0],2),
+                                                 round(cpu_system[1],2),
+                                                 round(cpu_user[0],2),
+                                                 round(cpu_user[1],2),
+                                                 round(cpu_softirq[0],2),
+                                                 round(cpu_softirq[1],2),
+                                                 round(cpu_wait[0],2),
+                                                 round(cpu_wait[1],2),
+                                                 round(mem_used[0],2),
+                                                 round(mem_used[1],2),
+                                                 round(mem_slabunrecl[0],2),
+                                                 round(mem_slabunrecl[1],2)))

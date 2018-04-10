@@ -40,10 +40,10 @@ def summary_uuid(es_backend, config, uuid, update):
 
 
 def data_summary(data):
-    std_dev = "{:.4f}".format(numpy.std(data)).ljust(10)
-    avg = "{:.4f}".format(numpy.mean(data)).ljust(10)
-    median = "{:.4f}".format(numpy.median(data)).ljust(10)
-    percentile95 = "{:.4f}".format(numpy.percentile(data, 95)).ljust(10)
+    std_dev = "{:.2f}".format(numpy.std(data)).ljust(10)
+    avg = "{:.2f}".format(numpy.mean(data)).ljust(10)
+    median = "{:.2f}".format(numpy.median(data)).ljust(10)
+    percentile95 = "{:.2f}".format(numpy.percentile(data, 95)).ljust(10)
     summary = [avg, std_dev, median, percentile95]
     return(summary)
 

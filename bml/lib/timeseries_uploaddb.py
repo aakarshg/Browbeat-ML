@@ -11,7 +11,7 @@ metrics_list = ["overcloud-controller-0.cpu-*.cpu-system",
                 "overcloud-controller-0.memory.memory-used"]
 
 
-def get_features(gdata, pos):
+def get_features(gdata, pos, metric_id):
     values = []
     empty_check = True
     for entry in gdata:
@@ -24,6 +24,10 @@ def get_features(gdata, pos):
     else:
         mean = round(numpy.mean(values), 2)
         percentile95 = round(numpy.percentile(values, 95), 2)
+        # Converting memory from bytes to MB.
+        if "memory" in metric_id:
+            mean = mean / 1000000
+            percentile95 = percentile95 / 1000000
         return [mean, percentile95]
 
 
@@ -48,8 +52,8 @@ def timeseriessummaries_db(elastic, config, uuid):
     mem_slabunrecl = summarize_metric(final_url, metrics_list[4])
     mem_used = summarize_metric(final_url, metrics_list[5])
     insert_timeseriessummaries_db(config, uuid, cpu_system, cpu_user,
-                                  cpu_softirq, cpu_wait, mem_slabunrecl,
-                                  mem_used)
+                                  cpu_softirq, cpu_wait, mem_used,
+                                  mem_slabunrecl)
 
 
 def summarize_metric(final_url, metric_id):
@@ -74,6 +78,6 @@ def summarize_metric(final_url, metric_id):
             else:
                 dict_vals[k] = [v]
         list_vals = map(list, dict_vals.items())
-        return get_features(list_vals, 1)
+        return get_features(list_vals, 1, metric_id)
     else:
-        return get_features(response[0]['datapoints'], 0)
+        return get_features(response[0]['datapoints'], 0, metric_id)

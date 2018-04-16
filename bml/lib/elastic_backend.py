@@ -116,3 +116,18 @@ class Backend(object):
                             }}}}}
         res = self.es.search(index="logstash-*", body=query_input)
         return res['hits']['total']
+
+
+    def push_summary_es(self, uuid, osp_version, test_name, mean, std_dev,
+                        perc95_score, output_prediction, ovn):
+        data={
+        "browbeat_uuid":str(uuid),
+        "osp_version":str(osp_version),
+        "action":str(test_name),
+        "mean":mean,
+        "std_dev":std_dev,
+        "percentile_95":perc95_score,
+        "class": output_prediction[0],
+        "with_ovn": ovn
+        }
+        self.es.index(index='bml_summary', doc_type='result', body=data)

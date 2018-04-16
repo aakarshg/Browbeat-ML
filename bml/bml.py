@@ -53,7 +53,8 @@ def parse_args():
 
     parser.add_argument('-u', '--update-db', dest='update', type=bool,
                         default=False,
-                        help='-u True pushes data to cockroach db')
+                        help='-u True pushes summary data to cockroach db \
+                        and elastic')
 
     parser.add_argument('--update-clf', dest="clf_days", type=int,
                         default=-1,

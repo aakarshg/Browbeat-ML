@@ -53,6 +53,7 @@ def print_run_details(config, es_backend, uuid, update):
     brun = browbeat_run(es_backend, uuid, caching=True)
     output_string = ""
     osp_version = ""
+    ovn = ""
     padding = longest_test_name(config)
     test_clean_count = 0  # count of the tests that are being classified
     '''
@@ -67,6 +68,7 @@ def print_run_details(config, es_backend, uuid, update):
         for test_run in brun.get_tests(test_search=test_name):
             data.extend(test_run.raw)
             osp_version = test_run.version
+            ovn = test_run.ovn
         if test_run is None:
             continue
         statistics_uuid = data_summary(data)
@@ -86,6 +88,7 @@ def print_run_details(config, es_backend, uuid, update):
         dlrn_hash = test_run.dlrn_hash
         puddle = test_run.rhos_puddle
         hash_check = check_hash(dlrn_hash, puddle)
+        output_prediction = "None"
         if time_check and cloud_check and hash_check:
             check_outcome = 1
             if test_checks:
@@ -98,7 +101,7 @@ def print_run_details(config, es_backend, uuid, update):
                                      average_runtime, output_prediction,
                                      test_run.timestamp, puddle,
                                      dlrn_hash, concurrency, times,
-                                     perc95_score)
+                                     perc95_score, ovn)
                 if int(output_prediction) == 1:
                     print("ALERT!!!!")
                     print(uuid, test_name, osp_version, average_runtime)
@@ -111,10 +114,15 @@ def print_run_details(config, es_backend, uuid, update):
                     insert_values_db(config, uuid, test_name, osp_version,
                                      average_runtime, test_run.timestamp,
                                      puddle, dlrn_hash, concurrency, times,
-                                     perc95_score)
+                                     perc95_score, ovn)
                 output_string += "\n"
         else:
             output_string += "\n"
+        if update:
+            es_backend.push_summary_es(uuid, osp_version, test_name,
+                                       average_runtime,
+                                       statistics_uuid[1], perc95_score,
+                                       output_prediction, ovn)
     '''
     conn.commit()
     conn.close()

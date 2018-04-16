@@ -79,7 +79,7 @@ class browbeat_test(object):
         else:
             return str(val)
 
-    # Extracts details of the really run
+    # Extracts details of the rally run
     def _set_metadata(self, raw_elastic):
         self._set_timeseries_metadata(raw_elastic)
         self._set_hardware_metadata(
@@ -98,6 +98,7 @@ class browbeat_test(object):
             self.run = self._typecheck_num(self.run)
             self.dlrn_hash = raw_elastic['_source']['version']['dlrn_hash']
             self.rhos_puddle = raw_elastic['_source']['version']['rhos_puddle']
+            self.ovn = True if "ovn" in raw_elastic['_source']['version']['logs_link'] else False  # noqa
             self.scenario_name = raw_elastic['_source']['rally_setup']['name']
             self.timestamp = raw_elastic['_source']['timestamp']
             self.num_computes = \

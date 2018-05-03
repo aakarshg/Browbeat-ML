@@ -47,16 +47,18 @@ class Backend(object):
     # Searches and grabs the raw source data for a Browbeat UUID
     def grab_uuid(self, uuid):
         query = {"query": {"match": {'browbeat_uuid': uuid}}}
-        results = helpers.scan(self.es,
-                               query,
-                               raise_on_error=False,
-                               size=100,
-                               request_timeout=1000)
-
-        if results == []:
+        # Should use scroll later on but meanwhile using search
+        # But because ideally we dont see that many hits
+        # search isn't entirely bad. but in future if hits are in thousands
+        # use scroll
+        res = self.es.search(index="browbeat-rally-*", body=query, size=1000)
+        # size ^ above is set to 1000, as we've never exceeded more than
+        # 300 entries for the uuids we've seen so far
+        if res == []:
             raise ValueError(uuid + " Has no results!")
-
-        return results
+        # As we switch from scroll api, we're using search to make sure
+        # elasticsearch doesnt keep hitting errors
+        return res['hits']['hits']
 
     def compute_start_end(self, uuid):
         query_input = {
